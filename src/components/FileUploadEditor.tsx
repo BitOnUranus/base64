@@ -16,7 +16,7 @@ const FileUploadEditor: React.FC = () => {
   const [isFileSaved, setIsFileSaved] = useState<boolean>(true);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const predefinedItems = [
+  const [predefinedItems] = useState([
     { id: 'item-1', content: 'Thank you for your submission.' },
     { id: 'item-2', content: 'Please review the attached document.' },
     { id: 'item-3', content: 'We appreciate your patience during this process.' },
@@ -24,7 +24,7 @@ const FileUploadEditor: React.FC = () => {
     { id: 'item-5', content: 'I look forward to our meeting next week.' },
     { id: 'item-6', content: 'Please confirm receipt of this email.' },
     { id: 'item-7', content: 'Best regards,' },
-  ];
+  ]);
 
   useEffect(() => {
     const loadSavedContent = async () => {
@@ -59,7 +59,6 @@ const FileUploadEditor: React.FC = () => {
         const result = await mammoth.convertToHtml({ arrayBuffer });
         processedContent = result.value;
       } else {
-        // Handle text files
         const allowedTypes = ['text/plain', 'text/markdown', 'text/html'];
         if (!allowedTypes.includes(file.type)) {
           toast.error('Please upload only text or Word (.docx) files');
@@ -71,8 +70,8 @@ const FileUploadEditor: React.FC = () => {
 
         const text = await file.text();
         processedContent = text
-          .replace(/^\uFEFF/, '') // Remove BOM if present
-          .replace(/[\x00-\x09\x0B-\x1F\x7F-\x9F]/g, ''); // Remove control characters except newlines
+          .replace(/^\uFEFF/, '')
+          .replace(/[\x00-\x09\x0B-\x1F\x7F-\x9F]/g, '');
       }
 
       setContent(processedContent);

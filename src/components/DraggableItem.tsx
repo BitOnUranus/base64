@@ -16,7 +16,7 @@ const DraggableItem: React.FC<DraggableItemProps> = ({ id, content, index }) => 
           ref={provided.innerRef}
           {...provided.draggableProps}
           className={`
-            p-3 rounded-md shadow-sm border border-slate-200 
+            mb-2 p-3 rounded-md shadow-sm border border-slate-200 
             ${snapshot.isDragging ? 'bg-teal-50 border-teal-200 shadow-md' : 'bg-white hover:bg-slate-50'} 
             transition-all ease-in-out duration-200
           `}
