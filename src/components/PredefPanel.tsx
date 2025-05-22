@@ -13,7 +13,7 @@ const PredefPanel: React.FC<PredefPanelProps> = ({ items }) => {
         <div
           ref={provided.innerRef}
           {...provided.droppableProps}
-          className={`bg-white border border-slate-300 rounded-lg p-3 min-h-[400px] overflow-y-auto transition-all ${
+          className={`space-y-2 bg-white border border-slate-300 rounded-lg p-3 min-h-[400px] overflow-y-auto transition-all ${
             snapshot.isDraggingOver ? 'bg-slate-50' : ''
           }`}
         >

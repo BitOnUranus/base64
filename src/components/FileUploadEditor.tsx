@@ -123,7 +123,7 @@ const FileUploadEditor: React.FC = () => {
     
     if (destination.droppableId === 'editor' && source.droppableId === 'predefined-panel') {
       const draggedItem = predefinedItems[source.index];
-      const newContent = content + (content ? '\n' : '') + draggedItem.content;
+      const newContent = `${content}${content ? '\n' : ''}${draggedItem.content}`;
       setContent(newContent);
       setIsFileSaved(false);
       toast.success('Text added to editor');
