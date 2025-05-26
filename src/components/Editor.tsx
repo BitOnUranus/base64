@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
-import { Droppable } from 'react-beautiful-dnd';
+import { useDroppable } from '@dnd-kit/core';
 import { Bold, Italic, Underline, List, ListOrdered } from 'lucide-react';
 
 interface EditorProps {
@@ -11,6 +11,10 @@ interface EditorProps {
 }
 
 const Editor: React.FC<EditorProps> = ({ content, onChange }) => {
+  const { setNodeRef } = useDroppable({
+    id: 'editor'
+  });
+
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -93,18 +97,12 @@ const Editor: React.FC<EditorProps> = ({ content, onChange }) => {
           <ListOrdered size={18} />
         </button>
       </div>
-      <Droppable droppableId="editor">
-        {(provided) => (
-          <div
-            ref={provided.innerRef}
-            {...provided.droppableProps}
-            className="border border-slate-300 rounded-b-lg bg-white overflow-auto min-h-[400px] shadow-sm transition-all hover:shadow focus-within:ring-2 focus-within:ring-teal-500 focus-within:ring-opacity-50"
-          >
-            <EditorContent editor={editor} />
-            {provided.placeholder}
-          </div>
-        )}
-      </Droppable>
+      <div
+        ref={setNodeRef}
+        className="border border-slate-300 rounded-b-lg bg-white overflow-auto min-h-[400px] shadow-sm transition-all hover:shadow focus-within:ring-2 focus-within:ring-teal-500 focus-within:ring-opacity-50"
+      >
+        <EditorContent editor={editor} />
+      </div>
     </div>
   );
 };

@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Upload, Save, Copy, FileText, Info } from 'lucide-react';
 import Editor from './Editor';
 import PredefPanel from './PredefPanel';
-import { DragDropContext, DropResult } from 'react-beautiful-dnd';
+import { DndContext, DragEndEvent } from '@dnd-kit/core';
 import toast from 'react-hot-toast';
 import mammoth from 'mammoth';
 import { encodeContent, decodeContent, saveFile, loadFile, fileExists } from '../utils/fileUtils';
@@ -14,8 +14,8 @@ const FileUploadEditor: React.FC = () => {
   const [base64Content, setBase64Content] = useState<string>('');
   const [isContentLoaded, setIsContentLoaded] = useState<boolean>(false);
   const [isFileSaved, setIsFileSaved] = useState<boolean>(true);
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const [usedItems, setUsedItems] = useState<Set<string>>(new Set());
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [predefinedItems] = useState([
     { id: 'item-1', content: 'Thank you for your submission.' },
@@ -117,18 +117,20 @@ const FileUploadEditor: React.FC = () => {
       .catch(() => toast.error('Failed to copy to clipboard'));
   };
 
-  const handleDragEnd = (result: DropResult) => {
-    if (!result.destination) return;
-
-    const { source, destination } = result;
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
     
-    if (destination.droppableId === 'editor' && source.droppableId === 'predefined-panel') {
-      const draggedItem = predefinedItems[source.index];
-      const newContent = `${content}${content ? '\n' : ''}${draggedItem.content}`;
-      setContent(newContent);
-      setIsFileSaved(false);
-      setUsedItems(prev => new Set([...prev, draggedItem.id]));
-      toast.success('Text added to editor');
+    if (!over) return;
+    
+    if (over.id === 'editor') {
+      const draggedItem = predefinedItems.find(item => item.id === active.id);
+      if (draggedItem) {
+        const newContent = `${content}${content ? '\n' : ''}${draggedItem.content}`;
+        setContent(newContent);
+        setIsFileSaved(false);
+        setUsedItems(prev => new Set([...prev, draggedItem.id]));
+        toast.success('Text added to editor');
+      }
     }
   };
 
@@ -189,7 +191,7 @@ const FileUploadEditor: React.FC = () => {
         <span>Drag and drop predefined text into the editor. Content will be saved in base64 format.</span>
       </div>
       
-      <DragDropContext onDragEnd={handleDragEnd}>
+      <DndContext onDragEnd={handleDragEnd}>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-6">
           <div className="md:col-span-2">
             <h2 className="text-lg font-semibold mb-3 text-slate-700">Document Editor</h2>
@@ -204,7 +206,7 @@ const FileUploadEditor: React.FC = () => {
             <PredefPanel items={predefinedItems} usedItems={usedItems} />
           </div>
         </div>
-      </DragDropContext>
+      </DndContext>
     </div>
   );
 };
