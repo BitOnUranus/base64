@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Upload, Save, Copy, FileText, Info } from 'lucide-react';
 import Editor from './Editor';
 import PredefPanel from './PredefPanel';
-import { DndContext, DragEndEvent } from '@dnd-kit/core';
+import { DndContext, DragEndEvent, DragOverlay } from '@dnd-kit/core';
 import toast from 'react-hot-toast';
 import mammoth from 'mammoth';
 import { encodeContent, decodeContent, saveFile, loadFile, fileExists } from '../utils/fileUtils';
@@ -15,6 +15,7 @@ const FileUploadEditor: React.FC = () => {
   const [isContentLoaded, setIsContentLoaded] = useState<boolean>(false);
   const [isFileSaved, setIsFileSaved] = useState<boolean>(true);
   const [usedItems, setUsedItems] = useState<Set<string>>(new Set());
+  const [activeDragId, setActiveDragId] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [predefinedItems] = useState([
@@ -117,6 +118,10 @@ const FileUploadEditor: React.FC = () => {
       .catch(() => toast.error('Failed to copy to clipboard'));
   };
 
+  const handleDragStart = (event: DragEndEvent) => {
+    setActiveDragId(event.active.id as string);
+  };
+
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     
@@ -132,7 +137,10 @@ const FileUploadEditor: React.FC = () => {
         toast.success('Text added to editor');
       }
     }
+    setActiveDragId(null);
   };
+
+  const activeDragItem = activeDragId ? predefinedItems.find(item => item.id === activeDragId) : null;
 
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden transition-all">
@@ -191,7 +199,7 @@ const FileUploadEditor: React.FC = () => {
         <span>Drag and drop predefined text into the editor. Content will be saved in base64 format.</span>
       </div>
       
-      <DndContext onDragEnd={handleDragEnd}>
+      <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-6">
           <div className="md:col-span-2">
             <h2 className="text-lg font-semibold mb-3 text-slate-700">Document Editor</h2>
@@ -206,6 +214,14 @@ const FileUploadEditor: React.FC = () => {
             <PredefPanel items={predefinedItems} usedItems={usedItems} />
           </div>
         </div>
+
+        <DragOverlay>
+          {activeDragItem && (
+            <div className="bg-white p-3 rounded-md shadow-lg border-2 border-teal-400 max-w-md">
+              <p className="text-sm text-slate-700">{activeDragItem.content}</p>
+            </div>
+          )}
+        </DragOverlay>
       </DndContext>
     </div>
   );
