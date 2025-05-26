@@ -4,9 +4,10 @@ import DraggableItem from './DraggableItem';
 
 interface PredefPanelProps {
   items: Array<{ id: string; content: string }>;
+  usedItems: Set<string>;
 }
 
-const PredefPanel: React.FC<PredefPanelProps> = ({ items }) => {
+const PredefPanel: React.FC<PredefPanelProps> = ({ items, usedItems }) => {
   return (
     <Droppable droppableId="predefined-panel">
       {(provided, snapshot) => (
@@ -22,7 +23,8 @@ const PredefPanel: React.FC<PredefPanelProps> = ({ items }) => {
               key={item.id}
               id={item.id} 
               content={item.content} 
-              index={index} 
+              index={index}
+              isUsed={usedItems.has(item.id)}
             />
           ))}
           {provided.placeholder}

@@ -15,6 +15,7 @@ const FileUploadEditor: React.FC = () => {
   const [isContentLoaded, setIsContentLoaded] = useState<boolean>(false);
   const [isFileSaved, setIsFileSaved] = useState<boolean>(true);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [usedItems, setUsedItems] = useState<Set<string>>(new Set());
 
   const [predefinedItems] = useState([
     { id: 'item-1', content: 'Thank you for your submission.' },
@@ -126,6 +127,7 @@ const FileUploadEditor: React.FC = () => {
       const newContent = `${content}${content ? '\n' : ''}${draggedItem.content}`;
       setContent(newContent);
       setIsFileSaved(false);
+      setUsedItems(prev => new Set([...prev, draggedItem.id]));
       toast.success('Text added to editor');
     }
   };
@@ -199,7 +201,7 @@ const FileUploadEditor: React.FC = () => {
           
           <div>
             <h2 className="text-lg font-semibold mb-3 text-slate-700">Predefined Text</h2>
-            <PredefPanel items={predefinedItems} />
+            <PredefPanel items={predefinedItems} usedItems={usedItems} />
           </div>
         </div>
       </DragDropContext>
